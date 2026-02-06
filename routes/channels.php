@@ -1,11 +1,8 @@
 <?php
 
-use App\Models\Board;
 use App\Models\Task;
-use App\Models\TaskList;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
