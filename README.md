@@ -35,14 +35,6 @@ Built as a portfolio project to showcase:
 - Pusher (WebSocket Communication)
 - Laravel Queues
 
-## 🚀 Technical Highlights
-
-- Implemented WebSocket connections for real-time multi-user collaboration
-- Built a role-based authorization system with workspace and board-level permissions
-- Designed RESTful API endpoints with proper authentication middleware
-- Integrated background job processing for scalable notification delivery
-- Created a drag-and-drop interface with optimistic UI updates
-
 ## 📋 Prerequisites
 
 Before installation, ensure you have:
