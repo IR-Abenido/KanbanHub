@@ -16,8 +16,7 @@ class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
         Board::class => BoardPolicy::class,
-        Workspace::class => WorkspacePolicy::class,
-        Task::class => TaskPolicy::class
+        Workspace::class => WorkspacePolicy::class
     ];
 
     public function boot(): void

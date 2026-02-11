@@ -125,7 +125,7 @@ class BoardPolicy
     }
 
 
-    public function getArchivedBoards(User $user, Workspace $workspace): bool
+    public function viewArchivedBoards(User $user, Workspace $workspace): bool
     {
         return
             $this->isWorkspaceManager($user, null, $workspace) ||

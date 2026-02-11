@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Board;
 use App\Models\User;
 use App\Models\Workspace;
 
@@ -56,5 +57,27 @@ class WorkspacePolicy
     public function addBoard(User $user, Workspace $workspace)
     {
         return $workspace->users()->where('user_id', $user->id)->exists();
+    }
+
+    public function viewArchivedBoards(User $user, Workspace $workspace): bool
+    {
+        return
+            $this->isWorkspaceManager($user,  $workspace) ||
+            $workspace->boards()
+            ->whereHas(
+                'board_members',
+                fn($query) =>
+                $query->wherePivot('user_id', $user->id)
+                    ->wherePivot('role', 'owner')
+            )
+            ->whereNotNull('archived_at')
+            ->exists();
+    }
+
+    public function unArchiveBoard(User $user, Workspace $workspace, Board $board): bool
+    {
+        return
+            $this->isWorkspaceManager($user, $workspace) ||
+            $user->hasBoardRole($board->id, 'owner');
     }
 }

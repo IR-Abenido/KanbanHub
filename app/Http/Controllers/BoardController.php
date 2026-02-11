@@ -53,7 +53,7 @@ class BoardController extends Controller
         $user = User::findOrFail(Auth::id());
         $boards = null;
 
-        $this->authorize('getArchivedBoards', [$user, $workspace]);
+        $this->authorize('viewArchivedBoards', $workspace);
 
         if ($workspace->users()->where('user_id', $user->id)
             ->whereIn('role', ['owner', 'admin'])->exists()
@@ -62,7 +62,7 @@ class BoardController extends Controller
         }else if($user->boards()->where('workspace_id', $workspace->id)
             ->wherePivot('role', 'owner')->exists()
         ){
-            $boards = $user->boards()->where('workspace_Id', $workspace->id)->whereNotNull('archived_at')
+            $boards = $user->boards()->where('workspace_id', $workspace->id)->whereNotNull('archived_at')
             ->wherePivot('role', 'owner')->get();
         }
 
@@ -245,7 +245,7 @@ class BoardController extends Controller
         $board = Board::with('users')->findOrFail($request->id);
         $workspace = Workspace::findOrFail($board->workspace_id);
 
-        $this->authorize('unArchiveBoard', $board);
+        $this->authorize('unArchiveBoard', [$workspace, $board]);
 
         $board->archived_at = null;
         $board->save();

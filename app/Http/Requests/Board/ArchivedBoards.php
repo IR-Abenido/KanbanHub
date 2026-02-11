@@ -14,6 +14,13 @@ class ArchivedBoards extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'workspaceId' => $this->route('workspaceId')
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
