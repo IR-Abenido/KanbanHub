@@ -15,11 +15,11 @@ Built as a portfolio project to showcase:
 
 - **Workspace & Board Management** - Create, update, archive, and delete workspaces and collaborative boards
 - **Real-time Collaboration** - Live updates across all connected users via Pusher WebSockets
-- **Task Management** - Drag-and-drop tasks between lists with due dates, file uploads, and activity logs
-- **Team Communication** - Member commenting system and activity notifications
+- **Task Management** - Drag-and-drop tasks between lists and set up due dates and upload files
+- **Team Communication** - Member commenting system and activity logs in tasks
 - **Access Control** - Role-based permissions for workspaces and boards
-- **Invitation System** - In-app user invitations with email support capability
-- **Background Processing** - Laravel Queues for asynchronous job handling
+- **Notification System** - In-app notification system for workspace invitations and important events
+- **Background Processing** - Laravel Queues for asynchronous job handling mainly for web socket events
 
 ## 🛠️ Tech Stack
 
@@ -108,7 +108,7 @@ Before installation, ensure you have:
 
 ## 📧 Email Configuration (Optional)
 
-While the app works with in-app notifications for workspace invitations, you can enable email invitations by configuring a mail service in `.env`:
+While the app works with in-app notifications for workspace invitations, you can enable workspace invitations via email by configuring a mail service in `.env`:
 ```env
 MAIL_MAILER=smtp
 MAIL_HOST=your_smtp_host
@@ -129,6 +129,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👤 Author
 
-**Your Name**
+**Ian Rafael T. Abenido**
 - GitHub: [@IR-Abenido](https://github.com/IR-Abenido)
 ---
