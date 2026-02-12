@@ -124,22 +124,6 @@ class BoardPolicy
         return false;
     }
 
-
-    public function viewArchivedBoards(User $user, Workspace $workspace): bool
-    {
-        return
-            $this->isWorkspaceManager($user, null, $workspace) ||
-            $workspace->boards()
-            ->whereHas(
-                'board_members',
-                fn($query) =>
-                $query->wherePivot('user_id', $user->id)
-                    ->wherePivot('role', 'owner')
-            )
-            ->whereNotNull('archived_at')
-            ->exists();
-    }
-
     public function isMember(User $user, Board $board): bool
     {
         return $this->isWorkspaceManager($user, $board, null) ||
@@ -161,12 +145,6 @@ class BoardPolicy
             $this->isBoardOwner($user, $board);
     }
 
-    public function unArchiveBoard(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $this->isBoardOwner($user, $board);
-    }
 
     public function destroyBoard(User $user, Board $board): bool
     {
