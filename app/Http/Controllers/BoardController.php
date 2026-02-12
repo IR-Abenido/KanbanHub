@@ -59,11 +59,11 @@ class BoardController extends Controller
             ->whereIn('role', ['owner', 'admin'])->exists()
         ) {
             $boards = $workspace->boards()->whereNotNull('archived_at')->get();
-        }else if($user->boards()->where('workspace_id', $workspace->id)
+        } else if ($user->boards()->where('workspace_id', $workspace->id)
             ->wherePivot('role', 'owner')->exists()
-        ){
+        ) {
             $boards = $user->boards()->where('workspace_id', $workspace->id)->whereNotNull('archived_at')
-            ->wherePivot('role', 'owner')->get();
+                ->wherePivot('role', 'owner')->get();
         }
 
         $mappedBoard = $boards->map(function ($board) {
@@ -133,9 +133,14 @@ class BoardController extends Controller
             ])
         ];
 
-        $taskLists = $board->taskLists()->with('tasks')
-           ->whereNull('archived_at')
-            ->orderBy('position_number', 'asc')->get();
+
+        $taskLists = $board->taskLists()
+            ->whereNull('archived_at')
+            ->with(['tasks' => function ($query) {
+                $query->orderBy('position_number', 'ASC');
+            }])
+            ->orderBy('position_number', 'ASC')
+            ->get();
 
         $mappedTaskLists = $taskLists->map(fn($list) => [
             'id' => $list->id,
