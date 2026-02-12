@@ -27,8 +27,7 @@ class TaskMove extends Notification implements ShouldBroadcastNow
     public function __construct($activityId, $taskId, $previousListId, $currentListId, $senderId)
     {
         $this->activity = TaskActivity::findOrFail($activityId);
-        $task = Task::with('users')->findOrFail($taskId);
-        $orderedTaskUsers = $task->users->sortBy('created_at')->values();
+        $task = Task::findOrFail($taskId);
         $this->task = [
             'id' => $task->id,
             'boardId' => $task->board_id,
@@ -40,12 +39,6 @@ class TaskMove extends Notification implements ShouldBroadcastNow
             'task_attributes' => $task->attributes,
             'position_number' => $task->position_number,
             'archived_at' => $task->archived_at,
-            'users' => $orderedTaskUsers->map(fn($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'profilePicture' => $user->profile_data['profilePicture'] ?? null
-            ])
         ];
         $this->list = TaskList::findOrFail($this->task['listId']);
         $this->previousListId = $previousListId;
