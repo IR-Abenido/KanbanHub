@@ -61,35 +61,6 @@ class TaskListController extends Controller
         ]);
     }
 
-    public function getLists(GetLists $request)
-    {
-        $board = Board::findOrFail($request->id);
-
-        $this->authorize('getLists', $board);
-
-        $taskLists = $board->taskLists()->whereNull('archived_at')
-            ->with('tasks')->orderBy('position_number', 'DESC')->get();
-
-        $mappedTaskLists = $taskLists->map(fn($list) => [
-            'id' => $list->id,
-            'name' => $list->name,
-            'archived_at' => Carbon::parse($list->archived_at)->format('Y-m-d'),
-            'tasks' => $list->tasks->map(fn($task) => [
-                'id' => $task->id,
-                'boardId' => $task->board_id,
-                'listId' => $task->list_id,
-                'description' => $task->description,
-                'deadline' => $task->deadline,
-                'status' => $task->status,
-                'archived_at' => $task->archived_at
-            ]),
-        ]);
-
-        return response()->json([
-            'taskLists' => $mappedTaskLists
-        ]);
-    }
-
     public function getArchivedLists(GetArchivedLists $request)
     {
         $board = Board::findOrFail($request->boardId);
