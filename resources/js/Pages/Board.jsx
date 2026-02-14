@@ -3,7 +3,7 @@ import BoardTaskListAdd from "@/Components/board/BoardTaskListAdd";
 import { Sidebar } from "@/Components/board/Sidebar";
 import {
     addList, addTask, boardAddUser, boardRemoveUser, boardUpdateUser, getBoardOwner, moveTaskFromList, removeList, removeTask, removeTaskDeadline, setBoard,
-    setLists, setTasks, setUsers, taskUpdateDescription, updateListName, updateTaskCompletionStatus, updateTaskDeadline, updateTaskTitle,
+    setLists, setTasks, setUsers, taskUpdateDescription, updateListName, updateListPosition, updateTaskCompletionStatus, updateTaskDeadline, updateTaskTitle,
 } from "@/Features/board/boardSlice";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePage } from "@inertiajs/react";
@@ -379,6 +379,15 @@ export default function Board() {
             }
         });
 
+        boardChannel.listen('.list.moved', (data) => {
+            if (data.senderId !== user.id) {
+                dispatch(updateListPosition({
+                    id: data.listId,
+                    position_number: data.updatedPositionNumber
+                }));
+            }
+        });
+
         return () => {
             boardChannel.stopListening(".board.removed");
             boardChannel.stopListening(".task.move");
@@ -396,6 +405,7 @@ export default function Board() {
             boardChannel.stopListening(".list.remove");
             boardChannel.stopListening(".list.restored");
             boardChannel.stopListening(".list.added");
+            boardChannel.stopListening(".list.moved");
         }
 
     }, [user, boardOwner]);
