@@ -58,6 +58,8 @@ export const boardSlice = createSlice({
             if (existingList) {
                 existingList.position_number = action.payload.position_number;
             }
+
+            state.lists.sort((a, b) => a.position_number - b.position_number);
         },
         setTasks(state, action) {
             const existingList = state.lists.find(list => list.id === action.payload.listId);
