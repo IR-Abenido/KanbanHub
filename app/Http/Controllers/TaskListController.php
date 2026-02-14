@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\RefreshNotifications;
+use App\Events\TaskListMove;
 use App\Http\Requests\TaskList\AddTaskList;
 use App\Http\Requests\TaskList\ArchiveList;
 use App\Http\Requests\TaskList\DeleteList;
@@ -15,6 +16,7 @@ use App\Http\Requests\TaskList\UpdateListsPosition;
 use App\Models\Board;
 use App\Models\TaskList;
 use App\Notifications\TaskListAdded;
+use App\Notifications\TaskListMoved;
 use App\Notifications\TaskListRemoved;
 use App\Notifications\TaskListRestored;
 use App\Notifications\TaskListUpdate;
@@ -233,6 +235,13 @@ class TaskListController extends Controller
 
         $taskList->position_number = $request->position_number;
         $taskList->save();
+
+        event(new TaskListMove(
+            $request->position_number,
+            $taskList->id,
+            $board->id,
+            Auth::id()
+        ));
 
         return response()->noContent();
     }
