@@ -38,65 +38,66 @@ Built as a portfolio project to showcase:
 ## 📋 Prerequisites
 
 Before installation, ensure you have:
-- PHP 8.2
-- Composer
-- Node.js
-- MySQL
+- Docker Desktop (https://www.docker.com/products/docker-desktop/)
+- [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows users)
 - A Pusher account (free tier works) - [Sign up here](https://pusher.com/)
+- All commands should be run in your WSL2 terminal
 
 ## ⚙️ Installation
 
-1. **Clone the repository**
+1. **Clone the repository (inside your WSL2 home directory)**
 ```bash
-   git clone https://github.com/IR-Abenido/KanbanHub.git
-   cd KanbanHub
+    git clone https://github.com/IR-Abenido/KanbanHub.git in the wsl directory
+    cd KanbanHub
 ```
 
-2. **Install dependencies**
+2. **Environment setup**
 ```bash
-   composer install
-   npm install
+    cp .env.example .env
 ```
 
-3. **Environment setup**
+3. **Install PHP dependencies (before Sail is available)**
 ```bash
-   cp .env.example .env
-   php artisan key:generate
+    docker run --rm -v $(pwd):/app -e COMPOSER_ALLOW_SUPERUSER=1 composer install --ignore-platform-reqs
 ```
 
 4. **Configure your `.env` file**
-
-   Update these essential variables:
+    Update these essential variables:
 ```env
-   # Database
-   DB_DATABASE=kanbanhub
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
+    # Database
+    DB_DATABASE=kanbanhub
+    DB_USERNAME=your_username
+    DB_PASSWORD=your_password
 
-   # Pusher (get these from your Pusher dashboard)
-   PUSHER_APP_ID=your_app_id
-   PUSHER_APP_KEY=your_app_key
-   PUSHER_APP_SECRET=your_app_secret
-   PUSHER_APP_CLUSTER=your_cluster
+    # Pusher (get these from your Pusher dashboard)
+    PUSHER_APP_ID=your_app_id
+    PUSHER_APP_KEY=your_app_key
+    PUSHER_APP_SECRET=your_app_secret
+    PUSHER_APP_CLUSTER=your_cluster
 
-   # Queue Connection
-   QUEUE_CONNECTION=database
+    # Queue Connection
+    QUEUE_CONNECTION=database
 ```
 
-5. **Initialize the database**
+5. **Start the Docker containers**
 ```bash
-   php artisan migrate
+    ./vendor/bin/sail up -d
 ```
 
-6. **Run the application**
+6. **Generate app key and install JS dependencies**
 ```bash
-   npm run start
+    ./vendor/bin/sail artisan key:generate
+    ./vendor/bin/sail npm install
 ```
 
-   This command runs three processes:
-   - `npm run dev` - Vite development server
-   - `php artisan serve` - Laravel API server
-   - `php artisan queue:work` - Background job processor
+7. **Run database migrations**
+```bash
+    ./vendor/bin/sail artisan migrate
+```
+7. **Start the development servers**
+```bash
+    ./vendor/bin/sail npm run start
+```
 
 ## 📧 Email Configuration (Optional)
 

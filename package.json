@@ -4,7 +4,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "start": "concurrently \"npm run dev\" \"php artisan serve\" \"php artisan queue:work\" "
+        "start": "concurrently \"npm run dev\" \"php artisan queue:work\" "
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
