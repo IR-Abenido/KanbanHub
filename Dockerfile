@@ -9,12 +9,15 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
+
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
-RUN npm install && npm run build
+
+RUN npm install
+
+RUN npm run build
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$PORT"]
-
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
