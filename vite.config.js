@@ -9,19 +9,5 @@ export default defineConfig({
             refresh: true,
         }),
         react(),
-    ],
-    define: {
-        'import.meta.env.VITE_REVERB_APP_KEY': JSON.stringify(
-            process.env.VITE_REVERB_APP_KEY || 'jihpl3l4kliugp1yjfre'
-        ),
-        'import.meta.env.VITE_REVERB_HOST': JSON.stringify(
-            process.env.VITE_REVERB_HOST || 'localhost'
-        ),
-        'import.meta.env.VITE_REVERB_PORT': JSON.stringify(
-            process.env.VITE_REVERB_PORT || '8080'
-        ),
-        'import.meta.env.VITE_REVERB_SCHEME': JSON.stringify(
-            process.env.VITE_REVERB_SCHEME || 'http'
-        ),
-    },
+    ]
 });
