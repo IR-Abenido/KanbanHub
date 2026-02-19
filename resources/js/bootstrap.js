@@ -11,8 +11,6 @@ git add */
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
-console.log(import.meta.env);
-
 window.Pusher = Pusher;
 
 window.Echo = new Echo({
