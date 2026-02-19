@@ -19,7 +19,7 @@ Built as a portfolio project to showcase:
 - **Team Communication** - Member commenting system and activity logs in tasks
 - **Access Control** - Role-based permissions for workspaces and boards
 - **Notification System** - In-app notification system for workspace invitations and important events
-- **Background Processing** - Laravel Queues for asynchronous job handling mainly for web socket events
+- **Background Processing** - Laravel Queues for asynchronous job handling mainly for web socket events and notifications Note: the project by default uses sync mode for events and notifications.
 
 ## 🛠️ Tech Stack
 
@@ -114,7 +114,7 @@ MAIL_PASSWORD=your_password
 
 - This is a portfolio/learning project built for demonstrating full-stack development skills
 - The invitation system currently works through in-app notifications; email functionality requires SMTP configuration
-- Background jobs use database queue driver by default (can be configured to use Redis)
+- Background processing defaults to `sync` mode. To enable job processing, set `QUEUE_CONNECTION=queue` (uses the database driver) and ensure events and notifications implement `ShouldQueue` instead of `ShouldBroadcastNow`
 
 ## 📄 License
 
