@@ -1,4 +1,4 @@
-# KanbanHub
+# KanbanHub (https://kanbanhub-vang.onrender.com)
 
 A full-stack Kanban board application with real-time collaboration features, built to demonstrate modern web development practices and full-stack capabilities.
 
@@ -76,7 +76,7 @@ Before installation, ensure you have:
     PUSHER_APP_CLUSTER=your_cluster
 
     # Queue Connection
-    QUEUE_CONNECTION=database
+    QUEUE_CONNECTION=sync *database if you are using ShouldQueue for the notifications and events*
 ```
 
 5. **Start the Docker containers**
