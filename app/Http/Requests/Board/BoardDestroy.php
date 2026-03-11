@@ -14,6 +14,13 @@ class BoardDestroy extends FormRequest
         return true;
     }
 
+    public function prepareForValidation()
+    {
+        return $this->merge([
+            'id' => $this->route('id'),
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
