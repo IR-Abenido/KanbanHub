@@ -41,7 +41,7 @@ class UserController extends Controller
     public function getUserNotifications()
     {
         $notifications = Auth::user()->unreadNotifications()
-        ->orderBy('created_at', 'desc')->get();
+            ->orderBy('created_at', 'desc')->get();
 
         $mappedNotifications = $notifications->map(function ($notification) {
             return match ($notification->type) {
@@ -194,6 +194,14 @@ class UserController extends Controller
                     'type' => $notification->data['type'] ?? 'list_added',
                     'id' => $notification->id,
                     'boardName' => $notification->data['boardName'] ?? null,
+                    'listName' => $notification->data['listName'] ?? null,
+                    'created_at' => $notification->created_at
+                ],
+                'App\Notifications\TaskNearDeadline' => [
+                    'type' => $notification->data['type'] ?? 'task_deadline_warning',
+                    'id' => $notification->id,
+                    'boardName' => $notification->data['boardName'] ?? null,
+                    'taskName' => $notification->data['taskName'] ?? null,
                     'listName' => $notification->data['listName'] ?? null,
                     'created_at' => $notification->created_at
                 ],
