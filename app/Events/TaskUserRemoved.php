@@ -51,6 +51,7 @@ class TaskUserRemoved implements ShouldBroadcastNow
         return [
             'taskId' => $this->taskId,
             'listId' => $this->listId,
+            'userId' => $this->removedUserId,
             'activity' => [
                 'id' => $this->activity->id,
                 'taskId' => $this->activity->task_id,

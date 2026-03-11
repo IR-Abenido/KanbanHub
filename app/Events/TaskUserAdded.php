@@ -57,6 +57,7 @@ class TaskUserAdded implements ShouldBroadcastNow
             'activity' => [
                 'id' => $this->activity->id,
                 'taskId' => $this->activity->task_id,
+                'userId' => $this->addedUser->id,
                 'userDetails' => [
                     'id' => $this->activity->user_details['id'],
                     'name' => $this->activity->user_details['name'],
