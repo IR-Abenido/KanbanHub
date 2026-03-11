@@ -148,7 +148,7 @@ class BoardController extends Controller
             'name' => $list->name,
             'position_number' => $list->position_number,
             'archived_at' => $list->archived_at ? Carbon::parse($list->archived_at)->format('Y-m-d') : null,
-            'tasks' => $list->tasks->map(fn($task) => [
+            'tasks' => $list->tasks->whereNull('archived_at')->map(fn($task) => [
                 'id' => $task->id,
                 'boardId' => $task->board_id,
                 'listId' => $task->list_id,
@@ -304,7 +304,6 @@ class BoardController extends Controller
     public function destroy(BoardDestroy $request)
     {
         $board = Board::findOrFail($request->id);
-        $user = User::findOrFail(Auth::id());
 
         $this->authorize('destroyBoard', $board);
 
