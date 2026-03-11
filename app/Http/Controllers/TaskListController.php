@@ -8,7 +8,6 @@ use App\Http\Requests\TaskList\AddTaskList;
 use App\Http\Requests\TaskList\ArchiveList;
 use App\Http\Requests\TaskList\DeleteList;
 use App\Http\Requests\TaskList\GetArchivedLists;
-use App\Http\Requests\TaskList\GetLists;
 use App\Http\Requests\TaskList\ReIndexLists;
 use App\Http\Requests\TaskList\UnArchiveList;
 use App\Http\Requests\TaskList\UpdateListName;
@@ -16,7 +15,6 @@ use App\Http\Requests\TaskList\UpdateListsPosition;
 use App\Models\Board;
 use App\Models\TaskList;
 use App\Notifications\TaskListAdded;
-use App\Notifications\TaskListMoved;
 use App\Notifications\TaskListRemoved;
 use App\Notifications\TaskListRestored;
 use App\Notifications\TaskListUpdate;
@@ -97,7 +95,7 @@ class TaskListController extends Controller
 
     public function updateListName(UpdateListName $request)
     {
-        $taskList = TaskList::findOrFail($request->id);
+        $taskList = TaskList::with('board')->findOrFail($request->id);
         $board = $taskList->board;
 
         $this->authorize('updateListName', $board);
@@ -126,7 +124,7 @@ class TaskListController extends Controller
 
     public function archiveList(ArchiveList $request)
     {
-        $taskList = TaskList::findOrFail($request->id);
+        $taskList = TaskList::with('board')->findOrFail($request->id);
         $board = $taskList->board;
 
         $this->authorize('archiveList', $board);
@@ -200,7 +198,7 @@ class TaskListController extends Controller
 
     public function destroy(DeleteList $request)
     {
-        $taskList = TaskList::findOrFail($request->id);
+        $taskList = TaskList::with('board')->findOrFail($request->id);
         $board = $taskList->board;
 
         $this->authorize('deleteList', $board);
@@ -228,7 +226,7 @@ class TaskListController extends Controller
 
     public function updateListsPosition(UpdateListsPosition $request)
     {
-        $taskList = TaskList::findOrFail($request->id);
+        $taskList = TaskList::with('board')->findOrFail($request->id);
         $board = $taskList->board;
 
         $this->authorize('updateListPosition', $board);
