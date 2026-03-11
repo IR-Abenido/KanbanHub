@@ -95,7 +95,7 @@ class TaskController extends Controller
 
     public function deleteTask(DeleteTask $request)
     {
-        $task = Task::findOrFail($request->id);
+        $task = Task::with('board')->findOrFail($request->id);
         $board = $task->board;
 
         $this->authorize('deleteTask', $board);
@@ -109,7 +109,7 @@ class TaskController extends Controller
 
     public function archiveTask(ArchiveTask $request)
     {
-        $task = Task::findOrFail($request->id);
+        $task = Task::with('board')->findOrFail($request->id);
         $board = $task->board;
 
         $this->authorize('archiveTask', $board);
@@ -329,6 +329,8 @@ class TaskController extends Controller
     {
         $task = Task::findOrFail($request->taskId);
 
+        $this->authorize('titleUpdate', $task);
+
         $previousTitle = $task->title;
         $task->title = $request->title;
         $task->save();
@@ -391,9 +393,8 @@ class TaskController extends Controller
     public function toggleCompletion(ToggleCompletion $request)
     {
         $task = Task::findOrFail($request->taskId);
-        $board = $task->board;
 
-        $this->authorize('toggleCompletion', $board);
+        $this->authorize('toggleCompletion', $task);
 
         $task->completed = !$task->completed;
         $task->save();
@@ -449,9 +450,8 @@ class TaskController extends Controller
     public function updateDescription(UpdateDescription $request)
     {
         $task = Task::findOrFail($request->taskId);
-        $board = $task->board;
 
-        $this->authorize('updateDescription', $board);
+        $this->authorize('updateDescription', $task);
 
         $task->description = $request->description;
         $task->save();
@@ -504,10 +504,10 @@ class TaskController extends Controller
     public function getActivities(GetActivities $request)
     {
         $task = Task::findOrFail($request->taskId);
-        $board = $task->board;
-        $sortedActivities = $task->task_activities()->with('user')->latest()->get();
 
-        $this->authorize('getActivities', $board);
+        $this->authorize('getActivities', $task);
+
+        $sortedActivities = $task->task_activities()->with('user')->latest()->get();
 
         return response()->json([
             'activities' => $sortedActivities->map(
@@ -530,9 +530,8 @@ class TaskController extends Controller
     public function getFiles(GetFiles $request)
     {
         $task = Task::findOrFail($request->taskId);
-        $board = $task->board;
 
-        $this->authorize('getFiles', $board);
+        $this->authorize('getFiles', $task);
 
         $attachments = $task->attachments;
 
@@ -549,9 +548,9 @@ class TaskController extends Controller
     public function downloadFiles(DownloadFiles $request)
     {
         $file = Attachment::findOrFail($request->fileId);
-        $board = $file->task->board;
+        $task = $file->task;
 
-        $this->authorize('downloadFiles', $board);
+        $this->authorize('downloadFiles', $task);
 
         $path = $file->attachment_attributes['path'];
 
@@ -562,9 +561,8 @@ class TaskController extends Controller
     {
         $user = Auth::user();
         $task = Task::findOrFail($request->taskId);
-        $board = $task->board;
 
-        $this->authorize('uploadFiles', $board);
+        $this->authorize('uploadFiles', $task);
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -642,9 +640,9 @@ class TaskController extends Controller
     public function deleteFiles(DeleteFiles $request)
     {
         $file = Attachment::findOrFail($request->fileId);
-        $board = $file->task->board;
+        $task = $file->task;
 
-        $this->authorize('deleteFiles', $board);
+        $this->authorize('deleteFiles', $task);
 
         Storage::disk('public')->delete($file->attachment_attributes['path']);
         $file->delete();
@@ -707,9 +705,8 @@ class TaskController extends Controller
         $user = Auth::user();
         $generatedId = Str::uuid();
         $task = Task::findOrFail($request->taskId);
-        $board = $task->board;
 
-        $this->authorize('addComment', $board);
+        $this->authorize('addComment', $task);
 
         $activity = TaskActivity::create([
             'id' => $generatedId,
@@ -743,7 +740,7 @@ class TaskController extends Controller
                     'profilePicture' => $user->profile_data['profilePicture']
                 ],
                 'activityDetails' => $activity->activity_details,
-                'created_at' => $activity->created_at->format('F j, Y g:i A')
+                'created_at' => $activity->created_at
             ]
         ]);
     }
@@ -752,7 +749,7 @@ class TaskController extends Controller
     {
         $comment = TaskActivity::findOrFail($request->commentId);
 
-        $this->authorize('editComment', [$comment->task->board, $comment]);
+        $this->authorize('editComment', [$comment->task, $comment]);
 
         $comment->activity_details = [
             ...$comment->activity_details,
@@ -775,9 +772,8 @@ class TaskController extends Controller
     {
         $comment = TaskActivity::findOrFail($request->commentId);
         $task = $comment->task;
-        $board = $task->board;
 
-        $this->authorize('deleteComment', [$board, $comment]);
+        $this->authorize('deleteComment', [$task, $comment]);
 
         $comment->delete();
 
@@ -795,7 +791,7 @@ class TaskController extends Controller
         $task = Task::findOrFail($request->taskId);
         $board = $task->board;
 
-        $this->authorize('setDueDate', $board);
+        $this->authorize('setDueDate', $task);
 
         $task->deadline = $request->date;
         $task->save();
@@ -803,7 +799,7 @@ class TaskController extends Controller
         $user = Auth::user();
         $generatedId = Str::uuid();
         $localeDate = Carbon::parse($request->date)
-            ->setTimezone('Asia/Manila')
+            ->timezone('Asia/Manila')
             ->toDayDateTimeString();
 
         $activity = TaskActivity::create([
@@ -841,7 +837,7 @@ class TaskController extends Controller
                     'profilePicture' => $activity->user_details['profilePicture']
                 ],
                 'activityDetails' => $activity->activity_details,
-                'created_at' => $activity->created_at->format('F j, Y g:i A')
+                'created_at' => $activity->created_at
             ]
         ]);
     }
@@ -850,9 +846,8 @@ class TaskController extends Controller
     {
         $task = Task::findOrFail($request->taskId);
         $task->deadline = null;
-        $board = $task->board;
 
-        $this->authorize('removeDueDate', $board);
+        $this->authorize('removeDueDate', $task);
 
         $task->save();
         $boardId = TaskList::findOrFail($task->list_id)->board_id;
@@ -893,7 +888,7 @@ class TaskController extends Controller
                     'profilePicture' => $activity->user_details['profilePicture']
                 ],
                 'activityDetails' => $activity->activity_details,
-                'created_at' => $activity->created_at->format('F j, Y g:i A')
+                'created_at' => $activity->created_at
             ]
         ]);
     }
