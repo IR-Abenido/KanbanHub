@@ -7,7 +7,7 @@ import '@uppy/dashboard/dist/style.min.css';
 import XHRUpload from '@uppy/xhr-upload';
 import { autoUpdate, flip, offset, shift, useFloating } from "@floating-ui/react";
 
-export default function TaskFilesUpload({ listId, taskId, setFiles, setActivities }) {
+export default function TaskFilesUpload({ taskId, setFiles, setActivities }) {
     const [show, setShow] = useState(false);
     const filesUploadRef = useRef(null);
     const toggle = () => {
@@ -91,24 +91,6 @@ export default function TaskFilesUpload({ listId, taskId, setFiles, setActivitie
                     text-blue-gray-800
                 `}
             >
-                <div className="flex flex-row justify-between items-center p-2 w-full">
-                    <Typography
-                        variant="h6"
-                    >
-                        Upload Files
-                    </Typography>
-                    <IconButton
-                        onClick={toggle}
-                        className="hover:bg-gray-400 rounded-sm mr-2
-                        self-end my-2"
-                        size="sm"
-                        variant="text"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                    </IconButton>
-                </div>
                 <div id="uppy-dashboard" />
             </div>
         </div>

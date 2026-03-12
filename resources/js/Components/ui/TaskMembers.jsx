@@ -104,113 +104,101 @@ export default function TaskMembers({ task, setActivities, members, setMembers }
                 className={`
                     mt-2 z-10 ${!show && 'hidden'}
                     bg-[#ebe9e9] rounded-md w-full min-w-[40%] max-w-[75%] md:max-w-[50%]
-                    text-blue-gray-800
+                    text-blue-gray-800 p-2
                 `}
             >
-                <div className="flex flex-col justify-end min-w-full">
-                    <IconButton
-                        onClick={toggle}
-                        className="hover:bg-gray-400 rounded-sm mr-2 my-2
-                        self-end"
-                        size="sm"
-                        variant="text"
+                <div className="mb-2 w-[100%]">
+                    <Typography
+                        variant="h6"
+                        color="blue-gray"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                    </IconButton>
-                    <div className="flex flex-col mx-2">
-                        {members?.length > 0 &&
-                            <div className="mb-2 w-[100%]">
-                                <Typography
-                                    variant="h6"
-                                    color="blue-gray"
+                        Members
+                    </Typography>
+                    {members?.length > 0 ? (
+                        <div className="flex flex-col gap-1 mt-1">
+                            {members.map(member => (
+                                <div
+                                    key={member.id}
+                                    className="flex flex-row justify-between"
                                 >
-                                    Members
-                                </Typography>
-                                <div className="flex flex-col gap-1 mt-1">
-                                    {members?.map(member => (
-                                        <div
-                                            key={member?.id}
-                                            className="flex flex-row justify-between"
+                                    <div className="flex flex-row justify-center items-center">
+                                        <Avatar
+                                            src={member?.profilePicture || '/images/default-avatar.png'}
+                                            size="sm"
+                                        />
+                                        <Typography
+                                            variant="p"
+                                            color="gray"
+                                            className="ml-2"
                                         >
-                                            <div
-                                                className="flex flex-row justify-center items-center"
-                                            >
-                                                <Avatar
-                                                    src={member?.profilePicture || '/images/default-avatar.png'}
-                                                    size="sm"
-                                                />
-                                                <Typography
-                                                    variant="p"
-                                                    color="gray"
-                                                    className="ml-2"
-                                                >
-                                                    {member?.name}
-                                                </Typography>
-                                            </div>
-                                            <IconButton
-                                                key={member?.id}
-                                                onClick={() => removeMember(member?.id)}
-                                                className="hover:scale-125 hover:shadow-none"
-                                                size="sm"
-                                                variant="text"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                </svg>
-                                            </IconButton>
-                                        </div>
-                                    ))}
+                                            {member.name}
+                                        </Typography>
+                                    </div>
+                                    <IconButton
+                                        onClick={() => removeMember(member.id)}
+                                        className="hover:scale-125 hover:shadow-none"
+                                        size="sm"
+                                        variant="text"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </IconButton>
                                 </div>
-                            </div>
-                        }
-                        {availableMembers?.length > 0 &&
-                            <div className="mb-2 w-[100%]">
-                                <Typography
-                                    variant="h6"
-                                    color="blue-gray"
+                            ))}
+                        </div>
+                    ) : (
+                        <Typography variant="small" color="gray" className="mt-1 italic">
+                            No members assigned
+                        </Typography>
+                    )}
+                </div>
+                <div className="mb-2 w-[100%]">
+                    <Typography
+                        variant="h6"
+                        color="blue-gray"
+                    >
+                        Add Members
+                    </Typography>
+
+                    {availableMembers?.length > 0 ? (
+                        <div className="flex flex-col gap-1 mt-1">
+                            {availableMembers.map(member => (
+                                <div
+                                    key={member.id}
+                                    className="flex flex-row justify-between"
                                 >
-                                    Add Members
-                                </Typography>
-                                <div className="flex flex-col gap-1 mt-1">
-                                    {availableMembers?.map(member => (
-                                        <div
-                                            key={member?.id}
-                                            className="flex flex-row justify-between"
+                                    <div className="flex flex-row justify-center items-center">
+                                        <Avatar
+                                            src={member?.profilePicture || '/images/default-avatar.png'}
+                                            size="sm"
+                                        />
+                                        <Typography
+                                            variant="p"
+                                            color="gray"
+                                            className="ml-2"
                                         >
-                                            <div
-                                                className="flex flex-row justify-center items-center"
-                                            >
-                                                <Avatar
-                                                    src={member?.profilePicture || '/images/default-avatar.png'}
-                                                    size="sm"
-                                                />
-                                                <Typography
-                                                    variant="p"
-                                                    color="gray"
-                                                    className="ml-2"
-                                                >
-                                                    {member?.name}
-                                                </Typography>
-                                            </div>
-                                            <IconButton
-                                                key={member?.id}
-                                                onClick={() => addMember(member?.id)}
-                                                className="hover:scale-125 hover:shadow-none"
-                                                size="sm"
-                                                variant="text"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                </svg>
-                                            </IconButton>
-                                        </div>
-                                    ))}
+                                            {member.name}
+                                        </Typography>
+                                    </div>
+                                    <IconButton
+                                        onClick={() => addMember(member.id)}
+                                        className="hover:scale-125 hover:shadow-none"
+                                        size="sm"
+                                        variant="text"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </IconButton>
                                 </div>
-                            </div>
-                        }
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <Typography variant="small" color="gray" className="mt-1">
+                            No available users
+                        </Typography>
+                    )}
                 </div>
             </div>
         </div >

@@ -162,17 +162,6 @@ export default function TaskAddDueDate({ task, setActivities }) {
                         >
                             Set Due Date
                         </Typography>
-                        <IconButton
-                            onClick={toggle}
-                            className="hover:bg-gray-400 rounded-sm mr-2
-                        self-end"
-                            size="sm"
-                            variant="text"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                            </svg>
-                        </IconButton>
                     </div>
                     <DatePicker
                         selected={currentDeadline}
