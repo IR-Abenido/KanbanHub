@@ -3,10 +3,10 @@ import BoardTaskListAdd from "@/Components/board/BoardTaskListAdd";
 import { Sidebar } from "@/Components/board/Sidebar";
 import {
     addList, addTask, boardAddUser, boardRemoveUser, boardUpdateUser, getBoardOwner, moveTaskFromList, removeList, removeTask, removeTaskDeadline, setBoard,
-    setLists, setTasks, setUsers, taskUpdateDescription, updateListName, updateListPosition, updateTaskCompletionStatus, updateTaskDeadline, updateTaskTitle,
+    setLists, setTasks, setUsers, taskAddUser, taskRemoveUser, taskUpdateDescription, updateListName, updateListPosition, updateTaskCompletionStatus, updateTaskDeadline, updateTaskTitle,
 } from "@/Features/board/boardSlice";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { calculateNewPosition, checkIfReposition } from "../Helper/positionHelper.js"
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import BoardTaskModal from "@/Components/board/BoardTaskModal.jsx";
 import { setUser } from "@/Features/user/userSlice.js";
-import { Inertia } from "@inertiajs/inertia";
 import { removeBoard } from "@/Features/workspaces/workspacesSlice.js";
 
 export default function Board() {
@@ -80,6 +79,7 @@ export default function Board() {
             if (checkIfReposition(updatedDestinationTasks)) {
                 reindexTasks(destinationListId);
             }
+
         } catch (errors) {
             dispatch(setTasks({
                 listId: sourceListId,
@@ -89,7 +89,7 @@ export default function Board() {
                 listId: destinationListId,
                 tasks: originalDestinationTasks
             }));
-            console.log(errors.response.data.errors);
+            console.log(errors);
         }
     };
 
@@ -160,7 +160,7 @@ export default function Board() {
                     source.droppableId, destination.droppableId, updatedMovingTask,
                     tasksClone, tasksClone, Array.from(taskLists.find((list) => list.id === destination.droppableId).tasks),
                     Array.from(taskLists.find((list) => list.id === source.droppableId).tasks)
-                )
+                );
             }
 
             if (source.droppableId !== destination.droppableId) {
@@ -229,7 +229,7 @@ export default function Board() {
                 id: data.boardId
             }));
 
-            Inertia.visit('/workspaces');
+            router.visit('/workspaces');
         });
 
         boardChannel.listen('.task.move', (data) => {
@@ -300,7 +300,7 @@ export default function Board() {
                 )) {
                     dispatch(boardUpdateUser({
                         id: boardOwnerRef.id,
-                        newRole: 'team_leader'
+                        newRole: 'admin'
                     }));
                 }
 
@@ -349,6 +349,26 @@ export default function Board() {
         boardChannel.listen('.task.restored', (data) => {
             if (data.senderId !== user.id) {
                 dispatch(addTask(data.task));
+            }
+        });
+
+        boardChannel.listen('.task.user.add', (data) => {
+            if (data.senderId !== user.id) {
+                dispatch(taskAddUser({
+                    listId: data.listId,
+                    taskId: data.taskId,
+                    user: data.addedUser
+                }));
+            }
+        });
+
+        boardChannel.listen('.task.user.remove', (data) => {
+            if (data.senderId !== user.id) {
+                dispatch(taskRemoveUser({
+                    listId: data.listId,
+                    taskId: data.taskId,
+                    userId: data.removedUserId
+                }));
             }
         });
 
@@ -406,6 +426,8 @@ export default function Board() {
             boardChannel.stopListening(".list.restored");
             boardChannel.stopListening(".list.added");
             boardChannel.stopListening(".list.moved");
+            boardChannel.stopListening(".task.user.add");
+            boardChannel.stopListening(".task.user.remove");
         }
 
     }, [user, boardOwner]);
