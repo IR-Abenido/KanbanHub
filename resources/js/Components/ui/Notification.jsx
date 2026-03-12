@@ -219,7 +219,7 @@ export default function Notification({ notification }) {
                                 </div>
                             </div>
                             <div className="flex flex-row gap-2 items-center">
-                                <Link onClick={markAsRead} className="text-xs text-blue-500 hover:underline">
+                                <Link onClick={markAsRead} className="text-xs text-blue-500">
                                     Mark as read
                                 </Link>
                                 <Typography variant="small" className="text-gray-500 text-xs">

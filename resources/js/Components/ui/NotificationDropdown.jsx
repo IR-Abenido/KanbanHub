@@ -7,6 +7,7 @@ import {
     setNotifications,
 } from "@/Features/notifications/notificationsSlice";
 import { Virtuoso } from "react-virtuoso";
+import { Link } from "@inertiajs/react";
 
 export default function NotificationDropdown({ user }) {
     const notifications = useSelector((state) => state.notifications);
@@ -23,6 +24,17 @@ export default function NotificationDropdown({ user }) {
         try {
             const response = await axios.get(route("user.notifications"));
             dispatch(setNotifications(response.data.notifications));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const markAllAsRead = async (e) => {
+        e.preventDefault();
+
+        try {
+            await axios.post(route('user.markAllNotification'));
+            dispatch(setNotifications([]));
         } catch (error) {
             console.log(error);
         }
@@ -144,6 +156,13 @@ export default function NotificationDropdown({ user }) {
                             No new notifications
                         </div>
                     )}
+                    {notifications.length > 0 &&
+                        <div className="border-t">
+                            <Link onClick={markAllAsRead} className="text-sm text-blue-500 ml-2">
+                                Mark all as read
+                            </Link>
+                        </div>
+                    }
                 </div>
             )}
         </div>
