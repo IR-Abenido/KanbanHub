@@ -10,7 +10,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setBoard } from "@/Features/board/boardSlice";
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/react';
 
 export default function BoardArchive() {
     const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function BoardArchive() {
             await axios.patch(route('board.archive', board.id));
             dispatch(setBoard({}));
             setProcessing(false);
-            Inertia.visit(route('workspaces.index'));
+            router.visit(route('workspaces.index'));
         } catch (error) {
             console.log(error);
             setProcessing(false);

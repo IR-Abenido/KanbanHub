@@ -9,8 +9,9 @@ import {
 } from "@material-tailwind/react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { Inertia } from "@inertiajs/inertia";
+
 import { setBoard } from "@/Features/board/boardSlice";
+import { router } from "@inertiajs/react";
 
 export default function BoardDelete() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -28,7 +29,7 @@ export default function BoardDelete() {
             await axios.delete(route('board.destroy', board.id));
             dispatch(setBoard({}));
             setProcessing(false);
-            Inertia.visit(route('workspaces.index'));
+            router.visit(route('workspaces.index'));
         } catch (error) {
             console.log(error.response.data.errors);
             setProcessing(false);
