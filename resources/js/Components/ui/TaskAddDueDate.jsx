@@ -1,4 +1,4 @@
-import { Button, Typography } from "@material-tailwind/react";
+import { Button, IconButton, Typography } from "@material-tailwind/react";
 import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,17 +12,20 @@ import timezone from 'dayjs/plugin/timezone'
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Singapore');
 
 export default function TaskAddDueDate({ task, setActivities }) {
     const dueDateRef = useRef(null);
     const [show, setShow] = useState(false);
-    const [currentDeadline, setCurrentDeadline] = useState(task.deadline ? new Date(task.deadline) : new Date());
+    const [currentDeadline, setCurrentDeadline] = useState(task.deadline ? dayjs(task.deadline) : dayjs());
     const dispatch = useDispatch();
     const toggle = () => {
         setShow(prev => !prev);
     };
+    const now = dayjs().tz();
 
-    const overdue = dayjs(task.deadline).isBefore(dayjs());
+    const overdue = dayjs(task.deadline).isBefore(now);
+    const dueSoon = dayjs(task.deadline).isAfter(now) && dayjs(task.deadline).isBefore(now.add(3, 'day'));
 
     const { x, y, strategy, refs } = useFloating({
         placement: "bottom-start",
@@ -92,7 +95,7 @@ export default function TaskAddDueDate({ task, setActivities }) {
     return (
         <div
             ref={dueDateRef}
-            className="mb-2"
+            className="mb-2 mr-2"
         >
             {!task.deadline &&
                 <Button
@@ -110,38 +113,33 @@ export default function TaskAddDueDate({ task, setActivities }) {
                 </Button>
             }
             {task.deadline &&
-                <div>
+                <button
+                    className="bg-[#E5E7EA] p-2 rounded-md flex flex-row gap-2
+                        items-baseline"
+                    onClick={toggle}
+                    ref={refs.setReference}
+                >
                     <Typography
-                        variant="h6"
+                        variant="small"
                         color="blue-gray"
                     >
-                        Due Date
+                        {dayjs(task.deadline).tz(dayjs.tz.guess()).format('MMMM DD, YYYY hh:mm A')}
                     </Typography>
-                    <button
-                        className="bg-[#E5E7EA] p-2 rounded-md flex flex-row gap-2
-                        items-baseline"
-                        onClick={toggle}
-                        ref={refs.setReference}
-                    >
-                        <Typography
-                            variant="small"
-                            color="blue-gray"
-                        >
-                            {dayjs.utc(task.deadline).tz(dayjs.tz.guess()).format('MMMM DD, YYYY hh:mm A')}
-                        </Typography>
-                        {overdue &&
-                            <div
-                                className="bg-[#FFECEB] px-1 rounded-sm"
-                            >
-                                <span
-                                    className="text-[#B1372D] text-sm"
-                                >
-                                    Overdue
-                                </span>
-                            </div>
-                        }
-                    </button>
-                </div>
+                    {overdue &&
+                        <div className="bg-red-100 px-2 py-0.5 rounded-md">
+                            <Typography variant="paragraph" className="text-red-700 font-medium">
+                                Overdue
+                            </Typography>
+                        </div>
+                    }
+                    {dueSoon &&
+                        <div className="bg-amber-100 px-2 py-0.5 rounded-md">
+                            <Typography variant="paragraph" className="text-amber-700 font-medium">
+                                Due Soon
+                            </Typography>
+                        </div>
+                    }
+                </button>
 
             }
             {show && (
@@ -154,8 +152,28 @@ export default function TaskAddDueDate({ task, setActivities }) {
                         width: "max-content",
                     }}
                     className="bg-[#ebe9e9] p-2 rounded-md z-10
-                    text-blue-gray-800 flex flex-col gap-2"
+                    text-blue-gray-800 flex flex-col gap-2 min-w-[35%]"
                 >
+                    <div
+                        className="flex flex-row justify-between"
+                    >
+                        <Typography
+                            variant="h6"
+                        >
+                            Set Due Date
+                        </Typography>
+                        <IconButton
+                            onClick={toggle}
+                            className="hover:bg-gray-400 rounded-sm mr-2
+                        self-end"
+                            size="sm"
+                            variant="text"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </IconButton>
+                    </div>
                     <DatePicker
                         selected={currentDeadline}
                         onChange={(date) => setCurrentDeadline(date)}
@@ -163,8 +181,8 @@ export default function TaskAddDueDate({ task, setActivities }) {
                         timeIntervals={30}
                         timeCaption="Time"
                         dateFormat="MMMM d, yyyy h:mm aa"
-                        className="min-w-[13rem]"
-                        minDate={new Date()}
+                        className="w-full"
+                        minDate={dayjs()}
                     />
                     <button
                         className="rounded-md bg-[#0C66E4] p-1"
@@ -174,7 +192,7 @@ export default function TaskAddDueDate({ task, setActivities }) {
                             variant="h6"
                             color="white"
                         >
-                            Set Deadline
+                            Confirm
                         </Typography>
                     </button>
                     {task.deadline &&
