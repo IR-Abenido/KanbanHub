@@ -17,6 +17,9 @@ export const boardSlice = createSlice({
         updateBoardName(state, action) {
             state.board.name = action.payload;
         },
+        updateBoardPrivacy(state, action){
+            state.board.private = action.payload
+        },
         addBoard(state, action) {
             const existingBoard = state.board.relatedBoards.find(board => board.id === action.payload.id);
 
@@ -266,6 +269,7 @@ export const {
     removeList,
     removeTask,
     updateBoardName,
+    updateBoardPrivacy,
     updateListName,
     updateListPosition,
     updateTaskPosition,
