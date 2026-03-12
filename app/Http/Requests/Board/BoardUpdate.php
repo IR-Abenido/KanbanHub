@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Board;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BoardUpdate extends FormRequest
 {
@@ -23,7 +24,7 @@ class BoardUpdate extends FormRequest
     {
         return [
             'id' => 'required|exists:boards,id',
-            'name' => 'required|string|max:115|unique:boards,name',
+            'name' => ['required', 'string', 'max:115', Rule::unique('boards', 'name')->ignore($this->input('id'))],
             'private' => 'required|boolean'
         ];
     }

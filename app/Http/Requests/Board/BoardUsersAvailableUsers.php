@@ -14,6 +14,13 @@ class BoardUsersAvailableUsers extends FormRequest
         return true;
     }
 
+    public function prepareForValidation()
+    {
+        return $this->merge([
+            'boardId' => $this->route('boardId'),
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
