@@ -73,7 +73,6 @@ class Board extends Model
 
     public function allUsers()
     {
-        // $workspace = Workspace::findOrFail($this->workspace_id);
         $workspace = $this->workspace;
 
         $workspaceAdmins = $workspace->users()
