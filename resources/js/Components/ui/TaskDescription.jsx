@@ -7,14 +7,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getTask, getUserRoles, taskUpdateDescription } from '@/Features/board/boardSlice';
 import { getUser } from '@/Features/user/userSlice';
 
-export default function TaskDescription({ task, setActivities }) {
+export default function TaskDescription({ task, setActivities, isTaskMember }) {
     const { description } = useSelector(state => getTask(state, task.listId, task.id));
     const user = useSelector(getUser);
     const { workspaceRole, boardRole } = useSelector(state => getUserRoles(state, user.id));
     const canEdit = (workspaceRole !== 'member' ||
         boardRole === 'owner' ||
         boardRole === 'admin' ||
-        boardRole === 'member');
+        isTaskMember);
 
     const editor = useEditor({
         extensions: [
