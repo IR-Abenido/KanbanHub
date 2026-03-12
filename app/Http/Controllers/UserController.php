@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Request;
 
 class UserController extends Controller
 {
@@ -214,13 +214,23 @@ class UserController extends Controller
 
     public function markAsRead(MarkAsRead $request)
     {
-        $user = Auth::user();
-        $notification = $user->notifications()->where('id', '=', $request->id)->first();
+        $notification = Auth::user()
+            ->notifications()
+            ->find($request->id);
 
         if ($notification) {
             $notification->markAsRead();
         }
 
-        return redirect()->back();
+        return response()->noContent();
+    }
+
+    public function markAllAsRead()
+    {
+        Auth::user()
+            ->unreadNotifications()
+            ->update(['read_at' => now()]);
+
+        return response()->noContent();
     }
 }
