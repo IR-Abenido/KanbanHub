@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -33,10 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 'task/description/update'
             ])
         ]);
-
-        // $middleware->trustProxies(at: [
-        //     '192.168.1.1',
-        //     '10.0.0.0/8',
-        // ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('app:check-task-deadlines')->daily()
+        ->name('checkTaskDeadlines');
     })
     ->withExceptions(function (Exceptions $exceptions) {})->create();
