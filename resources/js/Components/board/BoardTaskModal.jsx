@@ -1,5 +1,5 @@
-import { getTask, getUserRoles, updateTaskCompletionStatus, updateTaskTitle } from "@/Features/board/boardSlice";
-import { Button, Dialog, DialogBody, IconButton, Spinner, Tooltip, Typography } from "@material-tailwind/react";
+import { getTask, getUserRoles, taskAddUser, taskRemoveUser, updateTaskCompletionStatus, updateTaskTitle } from "@/Features/board/boardSlice";
+import { Badge, Button, Dialog, DialogBody, IconButton, Spinner, Typography } from "@material-tailwind/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,31 +11,122 @@ import TaskActivities from "../ui/TaskActivities";
 import TaskAddDueDate from "../ui/TaskAddDueDate";
 import { getUser } from "@/Features/user/userSlice";
 import BoardTaskRemoveOptions from "./BoardTaskRemoveOptions";
+import TaskMembers from "../ui/TaskMembers";
 
 export default function BoardTaskModal({ show, toggle, listId, taskId }) {
-    if (!listId || !taskId) return;
     const dispatch = useDispatch();
     const task = useSelector(state => getTask(state, listId, taskId));
+
     const user = useSelector(getUser);
     const [files, setFiles] = useState([]);
     const [activities, setActivities] = useState([]);
+    const [members, setMembers] = useState([]);
+    const userRoles = useSelector((state) => getUserRoles(state, user.id));
+    const isNormalMember = userRoles.workspaceRole === 'member' && userRoles.boardRole === 'member';
+    const isTaskMember = members.some((member) => member.id === user.id);
 
     const [enableTitleEdit, setEnableTitleEdit] = useState(false);
     const [fetchingActivities, setFetchingActivities] = useState(false);
+
+    let joinButtonContent = null;
+
+    if (members.length >= 2) {
+        joinButtonContent =
+            (<Button
+                size="sm"
+                color="gray"
+                disabled
+                variant="filled"
+                className="shadow-none hover:shadow-none
+                flex justify-center items-center cursor-none opacity-30 w-40"
+            >
+                Task Full
+                <Badge>{members.length}/3</Badge>
+            </Button>)
+    } else if (!isTaskMember && members.length < 2) {
+        joinButtonContent =
+            (<Button
+                size="sm"
+                color="green"
+                variant="filled"
+                className="shadow-none hover:shadow-none
+                flex justify-center items-center w-40"
+                onClick={() => addMember(user.id)}
+            >
+                Join
+            </Button>)
+    } else {
+        joinButtonContent =
+            (<Button
+                size="sm"
+                color="red"
+                variant="filled"
+                className="shadow-none hover:shadow-none
+                flex justify-center items-center w-40"
+                onClick={() => removeMember(user.id)
+                }
+            >
+                Leave
+            </Button >)
+    }
 
     const toggleTitleEdit = () => {
         setErrors(null);
         setEnableTitleEdit((prev) => !prev);
     };
 
+    const addMember = async (memberId) => {
+        try {
+            const response = await axios.post(route('task.add.user'), {
+                taskId: task.id,
+                userId: memberId
+            });
+
+            setMembers(prev => [...prev, response.data.user]);
+            setActivities(prev => [response.data.activity, ...prev]);
+        } catch (errors) {
+            console.log(errors);
+        }
+    }
+
+    const removeMember = async (memberId) => {
+        try {
+            const response = await axios.post(route('task.remove.user'), {
+                taskId: task.id,
+                userId: memberId
+            });
+
+            setMembers(prev => prev.filter(member => member.id !== memberId));
+            setActivities(prev => [response.data.activity, ...prev]);
+
+        } catch (errors) {
+            console.log(errors);
+        }
+    }
+
     const [titleData, setTitleData] = useState({
         taskId: taskId,
-        title: task.title,
+        title: task?.title,
     });
 
     const [errors, setErrors] = useState();
     const [processing, setProcessing] = useState(false);
     const [markAsCompleteProcessing, setMarkAsCompleteProcessing] = useState(false);
+
+    const getMembers = async () => {
+        try {
+            const response = await axios.get(route('task.get.users'), {
+                params: {
+                    taskId: task.id
+                }
+            });
+
+            setMembers(response.data.users);
+
+        } catch (errors) {
+            console.log(errors);
+        }
+    }
 
     const getAttachments = async () => {
         try {
@@ -114,71 +205,101 @@ export default function BoardTaskModal({ show, toggle, listId, taskId }) {
     };
 
     useEffect(() => {
-        getAttachments();
-        getActivities();
+        if (task) {
+            getAttachments();
+            getActivities();
+            getMembers();
+        }
     }, [taskId]);
 
     useEffect(() => {
-        const taskChannel = window.Echo.private(`task.${taskId}`);
+        if (task) {
+            const taskChannel = window.Echo.private(`task.${taskId}`);
 
-        taskChannel.listen('.task.move', (data) => {
-            if (user.id !== data.senderId) {
-                setActivities(prev => [data.activity, ...prev]);
+            taskChannel.listen('.task.move', (data) => {
+                if (user.id !== data.senderId) {
+                    setActivities(prev => [data.activity, ...prev]);
+                };
+            });
+
+            taskChannel.listen('.task.update.title', (data) => {
+                if (data.senderId !== user.id) {
+                    dispatch(updateTaskTitle({
+                        listId: data.listId,
+                        taskId: data.taskId,
+                        title: data.updatedTitle
+                    }));
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+            taskChannel.listen('.task.update.completed', (data) => {
+                if (data.senderId !== user.id) {
+                    dispatch(updateTaskCompletionStatus({
+                        listId: data.listId,
+                        taskId: data.taskId,
+                        completed: data.completed
+                    }))
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+            taskChannel.listen('.task.update.description', (data) => {
+                if (data.senderId !== user.id) {
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+
+            taskChannel.listen('.task.deadline.update', (data) => {
+                if (data.senderId !== user.id) {
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+            taskChannel.listen('.task.deadline.remove', (data) => {
+                if (data.senderId !== user.id) {
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+            taskChannel.listen('.task.user.add', (data) => {
+                if (data.senderId !== user.id) {
+                    dispatch(taskAddUser({
+                        listId: data.listId,
+                        taskId: data.taskId,
+                        user: data.addedUser
+                    }));
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+            taskChannel.listen('.task.user.remove', (data) => {
+                if (data.senderId !== user.id) {
+                    dispatch(taskRemoveUser({
+                        listId: data.listId,
+                        taskId: data.taskId,
+                        userId: data.removedUserId
+                    }));
+                    setActivities(prev => [data.activity, ...prev]);
+                }
+            });
+
+            return () => {
+                taskChannel.stopListening(".task.move");
+                taskChannel.stopListening(".task.update.title");
+                taskChannel.stopListening(".task.update.completed");
+                taskChannel.stopListening(".task.update.description");
+                taskChannel.stopListening(".task.deadline.update");
+                taskChannel.stopListening(".task.deadline.remove");
+                taskChannel.stopListening(".task.user.add");
+                taskChannel.stopListening(".task.user.remove");
             };
-        });
-
-        taskChannel.listen('.task.update.title', (data) => {
-            if (data.senderId !== user.id) {
-                dispatch(updateTaskTitle({
-                    listId: data.listId,
-                    taskId: data.taskId,
-                    title: data.updatedTitle
-                }));
-                setActivities(prev => [data.activity, ...prev]);
-            }
-        });
-
-        taskChannel.listen('.task.update.completed', (data) => {
-            console.log(data);
-            if (data.senderId !== user.id) {
-                dispatch(updateTaskCompletionStatus({
-                    listId: data.listId,
-                    taskId: data.taskId,
-                    completed: data.completed
-                }))
-                setActivities(prev => [data.activity, ...prev]);
-            }
-        });
-
-        taskChannel.listen('.task.update.description', (data) => {
-            if (data.senderId !== user.id) {
-                setActivities(prev => [data.activity, ...prev]);
-            }
-        });
-
-
-        taskChannel.listen('.task.deadline.update', (data) => {
-            if (data.senderId !== user.id) {
-                setActivities(prev => [data.activity, ...prev]);
-            }
-        });
-
-        taskChannel.listen('.task.deadline.remove', (data) => {
-            if (data.senderId !== user.id) {
-                setActivities(prev => [data.activity, ...prev]);
-            }
-        });
-
-        return () => {
-            taskChannel.stopListening(".task.move");
-            taskChannel.stopListening(".task.update.title");
-            taskChannel.stopListening(".task.update.completed");
-            taskChannel.stopListening(".task.update.description");
-            taskChannel.stopListening(".task.deadline.update");
-            taskChannel.stopListening(".task.deadline.remove");
-        };
+        }
 
     }, [listId, taskId, dispatch]);
+
+    if (!task) return null;
 
     return (
         <>
@@ -197,7 +318,7 @@ export default function BoardTaskModal({ show, toggle, listId, taskId }) {
                         className="flex flex-row justify-between items-center
                     text-blue-gray-900">
                         <div className="flex flex-row gap-2 items-baseline w-full">
-                            {!task.completed ?
+                            {!task?.completed ?
                                 <Button
                                     size="sm"
                                     disabled={markAsCompleteProcessing}
@@ -231,6 +352,9 @@ export default function BoardTaskModal({ show, toggle, listId, taskId }) {
                                     }
                                     Finished
                                 </Button>
+                            }
+                            {isNormalMember &&
+                                joinButtonContent
                             }
                             <div
                                 className="
@@ -272,7 +396,9 @@ export default function BoardTaskModal({ show, toggle, listId, taskId }) {
                                 {errors && <InputError message={errors.title} />}
                             </div>
                         </div>
-                        <BoardTaskRemoveOptions toggle={toggle} listId={listId} taskId={taskId} />
+                        {(isTaskMember || !userRoles.workspaceRole !== 'member' && userRoles.boardRole !== 'member') &&
+                            <BoardTaskRemoveOptions toggle={toggle} listId={listId} taskId={taskId} />
+                        }
                         <IconButton
                             color="blue-gray"
                             className="ml-2 h-6 w-6"
@@ -291,21 +417,33 @@ export default function BoardTaskModal({ show, toggle, listId, taskId }) {
                             <div className="flex flex-col">
                                 <div className="flex flex-col flex-grow">
                                     <div className="flex flex-row">
-                                        <TaskAddDueDate
-                                            task={task}
-                                            setActivities={setActivities}
-                                        />
-                                        <TaskFilesUpload
-                                            listId={listId}
-                                            taskId={taskId}
-                                            setFiles={setFiles}
-                                            setActivities={setActivities}
-                                        />
+                                        {isTaskMember &&
+                                            <>
+                                                <TaskAddDueDate
+                                                    task={task}
+                                                    setActivities={setActivities}
+                                                />
+                                                <TaskFilesUpload
+                                                    listId={listId}
+                                                    taskId={taskId}
+                                                    setFiles={setFiles}
+                                                    setActivities={setActivities}
+                                                />
+                                            </>
+                                        }
+                                        {(!userRoles.workspaceRole !== 'member' && userRoles.boardRole !== 'member') &&
+                                            <TaskMembers
+                                                task={task}
+                                                setActivities={setActivities}
+                                                members={members}
+                                                setMembers={setMembers}
+                                            />
+                                        }
                                     </div>
                                     <TaskDescription
                                         task={task}
                                         setActivities={setActivities}
-
+                                        isTaskMember={isTaskMember}
                                     />
                                     <TaskAttachments
                                         files={files}
