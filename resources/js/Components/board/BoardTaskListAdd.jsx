@@ -34,7 +34,6 @@ export default function BoardTaskListAdd() {
         setProcessing(true);
         try {
             const response = await axios.post(route('taskList.add'), data);
-            console.log(response.data.newList);
             dispatch(addList(response.data.newList));
             toggle();
             reset();
