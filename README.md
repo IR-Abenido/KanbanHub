@@ -4,7 +4,7 @@ A full-stack Kanban board application with real-time collaboration features, bui
 
 ## 🎯 Project Purpose
 
-Built as a portfolio project to showcase:
+Built as a portfolio and Laravel learning project to showcase:
 - Full-stack development with Laravel and React
 - Real-time collaboration using WebSockets
 - Complex state management with Redux
@@ -18,7 +18,7 @@ Built as a portfolio project to showcase:
 - **Task Management** - Drag-and-drop tasks between lists and set up due dates and upload files
 - **Team Communication** - Member commenting system and activity logs in tasks
 - **Access Control** - Role-based permissions for workspaces and boards
-- **Notification System** - In-app notification system for workspace invitations and important events
+- **Notification System** - In-app notification system for workspace invitations and important events as well as a daily scheduled task deadline checker.
 - **Background Processing** - Laravel Queues for asynchronous job handling mainly for web socket events and notifications Note: the project by default uses sync mode for events and notifications.
 
 ## 🛠️ Tech Stack
@@ -94,9 +94,9 @@ Before installation, ensure you have:
 ```bash
     ./vendor/bin/sail artisan migrate
 ```
-7. **Start the development servers**
+8. **Start the development servers**
 ```bash
-    ./vendor/bin/sail npm run start
+    ./vendor/bin/sail npm run dev
 ```
 
 ## 📧 Email Configuration (Optional)
@@ -115,6 +115,7 @@ MAIL_PASSWORD=your_password
 - This is a portfolio/learning project built for demonstrating full-stack development skills
 - The invitation system currently works through in-app notifications; email functionality requires SMTP configuration
 - Background processing defaults to `sync` mode. To enable job processing, set `QUEUE_CONNECTION=queue` (uses the database driver) and ensure events and notifications implement `ShouldQueue` instead of `ShouldBroadcastNow`
+- The scheduled checker for task deadlines will not work as expected on the project hosted in render since in render free tier the hosted project will go inactive after some time with no interaction which will result in the scheduler being frozen as well.
 
 ## 📄 License
 
