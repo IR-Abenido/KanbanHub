@@ -120,22 +120,23 @@ export default function TaskMembers({ task, setActivities, members, setMembers }
                         </svg>
                     </IconButton>
                     <div className="flex flex-col mx-2">
-                        <div className="mb-2 w-[100%]">
-                            <Typography
-                                variant="h6"
-                                color="blue-gray"
-                            >
-                                Members
-                            </Typography>
-
-                            {members?.length > 0 ? (
+                        {members?.length > 0 &&
+                            <div className="mb-2 w-[100%]">
+                                <Typography
+                                    variant="h6"
+                                    color="blue-gray"
+                                >
+                                    Members
+                                </Typography>
                                 <div className="flex flex-col gap-1 mt-1">
-                                    {members.map(member => (
+                                    {members?.map(member => (
                                         <div
                                             key={member?.id}
                                             className="flex flex-row justify-between"
                                         >
-                                            <div className="flex flex-row justify-center items-center">
+                                            <div
+                                                className="flex flex-row justify-center items-center"
+                                            >
                                                 <Avatar
                                                     src={member?.profilePicture || '/images/default-avatar.png'}
                                                     size="sm"
@@ -148,8 +149,8 @@ export default function TaskMembers({ task, setActivities, members, setMembers }
                                                     {member?.name}
                                                 </Typography>
                                             </div>
-
                                             <IconButton
+                                                key={member?.id}
                                                 onClick={() => removeMember(member?.id)}
                                                 className="hover:scale-125 hover:shadow-none"
                                                 size="sm"
@@ -162,28 +163,25 @@ export default function TaskMembers({ task, setActivities, members, setMembers }
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <Typography color="gray" className="text-sm mt-1">
-                                    No users
+                            </div>
+                        }
+                        {availableMembers?.length > 0 &&
+                            <div className="mb-2 w-[100%]">
+                                <Typography
+                                    variant="h6"
+                                    color="blue-gray"
+                                >
+                                    Add Members
                                 </Typography>
-                            )}
-                        </div>
-                        <div className="mb-2 w-[100%]">
-                            <Typography
-                                variant="h6"
-                                color="blue-gray"
-                            >
-                                Add Members
-                            </Typography>
-
-                            {availableMembers?.length > 0 ? (
                                 <div className="flex flex-col gap-1 mt-1">
-                                    {availableMembers.map(member => (
+                                    {availableMembers?.map(member => (
                                         <div
                                             key={member?.id}
                                             className="flex flex-row justify-between"
                                         >
-                                            <div className="flex flex-row justify-center items-center">
+                                            <div
+                                                className="flex flex-row justify-center items-center"
+                                            >
                                                 <Avatar
                                                     src={member?.profilePicture || '/images/default-avatar.png'}
                                                     size="sm"
@@ -196,8 +194,8 @@ export default function TaskMembers({ task, setActivities, members, setMembers }
                                                     {member?.name}
                                                 </Typography>
                                             </div>
-
                                             <IconButton
+                                                key={member?.id}
                                                 onClick={() => addMember(member?.id)}
                                                 className="hover:scale-125 hover:shadow-none"
                                                 size="sm"
@@ -210,12 +208,8 @@ export default function TaskMembers({ task, setActivities, members, setMembers }
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <Typography color="gray" className="text-sm mt-1">
-                                    No available board users
-                                </Typography>
-                            )}
-                        </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
