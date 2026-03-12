@@ -171,7 +171,6 @@ export default function TaskActivities({ task, activities, setActivities, refres
         const taskChannel = window.Echo.private(`task.${task.id}`);
 
         taskChannel.listen('.task.add.comment', (data) => {
-            console.log(data);
             if (data.senderId !== user.id) {
                 setActivities(prev => [data.activity, ...prev]);
             };
