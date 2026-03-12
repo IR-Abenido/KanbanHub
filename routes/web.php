@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/notifications', [UserController::class, 'getUserNotifications'])->name('user.notifications');
     Route::post('/notifications/{id}/markAsRead', [UserController::class, 'markAsRead'])->name('user.markNotification');
+    Route::post('/notifications/markAllAsRead', [UserController::class,'markAllAsRead'])->name('user.markAllNotification');
     Route::post('/users/{searchInput}', [UserController::class, 'findUserOrUsers'])->name('user.search');
 
     Route::post('/workspace/invite', [InviteController::class, 'inviteMember'])->name('user.invite');
