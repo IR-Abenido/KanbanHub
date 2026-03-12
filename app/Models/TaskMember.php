@@ -9,6 +9,7 @@ class TaskMember extends Model
 {
     protected $keyType = 'string';
     protected $table = 'task_members';
+
     protected $fillable = [
         'task_id',
         'user_id'
@@ -19,8 +20,13 @@ class TaskMember extends Model
         'user_id' => 'string'
     ];
 
-    public function board(): BelongsTo
+    public function task(): BelongsTo
     {
-        return $this->belongsTo(Board::class, 'board_id');
+        return $this->belongsTo(Task::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
