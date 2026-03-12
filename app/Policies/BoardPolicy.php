@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Board;
-use App\Models\TaskActivity;
 use App\Models\User;
 use App\Models\Workspace;
 
@@ -211,94 +210,6 @@ class BoardPolicy
     }
 
     public function moveTask(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function titleUpdate(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function toggleCompletion(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function updateDescription(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function getActivities(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function getFiles(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function downloadFiles(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-    public function uploadFiles(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function deleteFiles(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function addComment(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function editComment(User $user, Board $board, TaskActivity $activity): bool
-    {
-        return $activity->user_id === $user->id;
-    }
-
-    public function deleteComment(User $user, Board $board, TaskActivity $activity): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $activity->user_id === $user->id;
-    }
-
-    public function setDueDate(User $user, Board $board): bool
-    {
-        return
-            $this->isWorkspaceManager($user, $board, null) ||
-            $board->users()->where('user_id', $user->id)->exists();
-    }
-
-    public function removeDueDate(User $user, Board $board): bool
     {
         return
             $this->isWorkspaceManager($user, $board, null) ||
