@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -91,5 +92,10 @@ class User extends Authenticatable
         return $this->boards()
         ->where('board_id', $boardId)
         ->where('role', $role)->exists();
+    }
+
+    public function tasks(): BelongsToMany
+    {
+        return $this->BelongsToMany(Task::class, 'task_members', 'user_id', 'task_id');
     }
 }
