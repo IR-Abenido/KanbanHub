@@ -96,7 +96,7 @@ class TaskUsersController extends Controller
         ]);
 
         Notification::send($targetUser, new TaskUserAdded(
-            $task->name,
+            $task->title,
             $targetUser->name
         ));
 
@@ -166,7 +166,7 @@ class TaskUsersController extends Controller
         ]);
 
         Notification::send($targetUser, new TaskUserRemoved(
-            $task->name,
+            $task->title,
             $targetUser->name
         ));
 
