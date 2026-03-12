@@ -1,12 +1,12 @@
-import { Button, Dialog, DialogBody, DialogHeader, ListItem, ListItemPrefix } from "@material-tailwind/react";
-import { useCallback, useState } from "react";
+import { Button, Dialog, DialogBody, DialogHeader, ListItem, ListItemPrefix, Typography } from "@material-tailwind/react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import InputLabel from "../ui/InputLabel";
 import TextInput from "../ui/TextInput";
 import InputError from "../ui/InputError";
 import axios from "axios";
 import BoardDataManagement from "./BoardDataManagement";
-import { getUserRoles, updateBoardName } from "@/Features/board/boardSlice";
+import { getUserRoles, updateBoardName, updateBoardPrivacy } from "@/Features/board/boardSlice";
 import InputSuccess from "../ui/InputSuccess";
 import { getUser } from "@/Features/user/userSlice";
 
@@ -20,7 +20,8 @@ export default function BoardSettings() {
     const [successMessage, setSuccessMessage] = useState(null);
     const [data, setData] = useState({
         id: board.id,
-        name: board.name
+        name: board.name,
+        private: !!board.private
     });
     const user = useSelector(getUser);
     const userRoles = useSelector(state => getUserRoles(state, user.id));
@@ -28,11 +29,13 @@ export default function BoardSettings() {
     const reset = useCallback(() => {
         setData({
             id: board.id,
-            name: board.name
+            name: board.name,
+            private: !!board.private
         });
     }, [board]);
 
     const toggle = () => {
+        setErrors(null);
         setShow(prev => !prev);
     };
 
@@ -42,15 +45,26 @@ export default function BoardSettings() {
 
         try {
             await axios.patch(route('board.update', board.id), data);
-            setSuccessMessage("Board name has been updated!");
+            setSuccessMessage("Board information has been updated!");
             dispatch(updateBoardName(data.name));
+            dispatch(updateBoardPrivacy(data.private === true ? 1 : 0));
             setProcessing(false);
         } catch (error) {
             setErrors(error.response.data.errors);
             console.log(error.response.data.errors);
             setProcessing(false);
         }
-    }, [data.name, dispatch]);
+    }, [data.name, data.private, dispatch]);
+
+    useEffect(() => {
+        if (board.id) {  // only sync when board is actually loaded
+            setData({
+                id: board.id,
+                name: board.name,
+                private: !!board.private
+            });
+        }
+    }, [board]);
 
     return (
         <div>
@@ -75,16 +89,30 @@ export default function BoardSettings() {
                 <DialogHeader>{board.name} Settings</DialogHeader>
                 <DialogBody>
                     <div className="border p-4 rounded-lg mb-4">
+                        <Typography
+                            variant="lead"
+                            color="black"
+                            className="mb-4"
+                        >
+                            Board Information
+                        </Typography>
                         <InputLabel className="mb-2">
                             Name
                         </InputLabel>
                         <TextInput
                             className={`w-full text-black ${errors ? 'border-[2px] border-red-500' : ''} mb-2`}
-                            type="text" value={data.name}
-                            onChange={(e) => setData({...data, name: e.target.value })}
-
+                            type="text"
+                            value={data.name}
+                            onChange={(e) => setData({ ...data, name: e.target.value })}
                         />
                         {errors && <InputError message={errors.name} />}
+                        <InputLabel className="mb-2 max-w-32">
+                            <Typography variant="small">
+                                Set to private?
+                                <input className="ml-2" type="checkbox" checked={data.private} onChange={() => setData({ ...data, private: !data.private })} />
+                            </Typography>
+                        </InputLabel>
+                        {errors && <InputError message={errors.private} />}
                         {successMessage && <InputSuccess message={successMessage} />}
                         <div className="flex flex-row">
                             <Button
@@ -100,7 +128,7 @@ export default function BoardSettings() {
                         </div>
                     </div>
                     {
-                       (userRoles.workspaceRole !== 'member' || userRoles.boardRole === 'owner')
+                        (userRoles.workspaceRole !== 'member' || userRoles.boardRole === 'owner')
                         && <BoardDataManagement />
                     }
                 </DialogBody>
