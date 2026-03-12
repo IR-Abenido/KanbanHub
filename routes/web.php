@@ -8,6 +8,7 @@ use App\Http\Controllers\InviteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskListController;
+use App\Http\Controllers\TaskUsersController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceUsersController;
 use App\Http\Controllers\UserController;
@@ -85,12 +86,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('taskList/position/update', [TaskListController::class, 'updateListsPosition'])->name('taskList.position.update');
     Route::delete('taskList/destroy', [TaskListController::class, 'destroy'])->name('taskList.destroy');
 
-    Route::get('task/users', [TaskController::class, 'getUsers'])->name('task.get.users');
-    Route::post('task/user/add', [TaskController::class, 'addUser'])->name('task.add.user');
-    Route::post('task/user/remove', [TaskController::class, 'removeUser'])->name('task.remove.user');
+    Route::get('task/users', [TaskUsersController::class, 'getUsers'])->name('task.get.users');
+    Route::get('task/availableUsers', [TaskUsersController::class, 'getAvailableBoardUsers'])->name('task.availableUsers.get');
+    Route::post('task/user/add', [TaskUsersController::class, 'addUser'])->name('task.add.user');
+    Route::post('task/user/remove', [TaskUsersController::class, 'removeUser'])->name('task.remove.user');
+
     Route::post('task/add', [TaskController::class, 'addTask'])->name('task.add');
     Route::patch('task/position/update', [TaskController::class, 'moveTask'])->name('task.position.update');
-    // Route::get('task/getArchived', [TaskController::class, 'getArchivedTasks'])->name('task.getArchivedTasks');
+
     Route::get('task/getAllArchived', [TaskController::class, 'getAllArchivedTasks'])->name('task.getAllArchived');
     Route::patch('tasks/archive', [TaskController::class, 'archiveTask'])->name('task.archive');
     Route::patch('tasks/unArchive', [TaskController::class, 'unArchiveTask'])->name('task.unArchive');
