@@ -48,7 +48,10 @@ export default function Profile() {
                         return (
                             <MenuItem
                                 key={label}
-                                onClick={closeMenu}
+                                onClick={() => {
+                                    closeMenu();
+                                    if (isLastItem) post(route('logout'));  // handle logout here
+                                }}
                                 className={`flex items-center gap-2 rounded ${isLastItem
                                     ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
                                     : ""
@@ -64,10 +67,9 @@ export default function Profile() {
                                     className="font-normal"
                                     color={isLastItem ? "red" : "inherit"}
                                 >
-                                    {label === 'Log out' ?
-                                        <button onClick={() => { post(route('logout')) }}>Log out</button>
-                                        :
-                                        <Link href={url}>{label}</Link>
+                                    {label === 'Log out'
+                                        ? 'Log out'
+                                        : <Link href={url}>{label}</Link>
                                     }
                                 </Typography>
                             </MenuItem>
