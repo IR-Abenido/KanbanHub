@@ -115,7 +115,7 @@ MAIL_PASSWORD=your_password
 - This is a portfolio/learning project built for demonstrating full-stack development skills
 - The invitation system currently works through in-app notifications; email functionality requires SMTP configuration
 - Background processing defaults to `sync` mode. To enable job processing, set `QUEUE_CONNECTION=queue` (uses the database driver) and ensure events and notifications implement `ShouldQueue` instead of `ShouldBroadcastNow`
-- The scheduled checker for task deadlines will not work as expected on the project hosted in render since in render free tier the hosted project will go inactive after some time with no interaction which will result in the scheduler being frozen as well.
+- The scheduled checker for task deadlines will not work as expected on the project hosted in render since in render free tier the hosted project will go inactive after some time with no interaction which will result in the scheduler being frozen as well. This however can be bypassed by using the keep-alive script in my github repository.
 
 ## 📄 License
 
