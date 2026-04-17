@@ -84,10 +84,11 @@ Before installation, ensure you have:
     ./vendor/bin/sail up -d
 ```
 
-6. **Generate app key and install JS dependencies**
+6. **Generate app key and install JS dependencies and setup storage link**
 ```bash
     ./vendor/bin/sail artisan key:generate
     ./vendor/bin/sail npm install
+    docker compose exec app php artisan storage:link
 ```
 
 7. **Run database migrations**
